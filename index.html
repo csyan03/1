@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小明同学的主页</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="profile">
+        <img src="241226-t.jpg" alt="头像" class="avatar">
+        <div class="info">
+            <h2>小明同学</h2>
+            <p>752 获赞 · 58 关注 · 88 粉丝</p>
+        </div>
+    </div>
+    
+    <div class="gallery">
+        <div class="folder" onclick="openFolder(1)">
+            <img src="250115-1.jpg" alt="文件夹1">
+        </div>
+        <div class="folder" onclick="openFolder(2)">
+            <img src="250101-1.jpg" alt="文件夹2">
+        </div>
+        <div class="folder" onclick="openFolder(3)">
+            <img src="241215-4.webp" alt="文件夹3">
+        </div>
+    </div>
+
+    <script>
+        function openFolder(folderId) {
+            window.location.href = `folder${folderId}.html`;
+        }
+    </script>
+</body>
+</html>
