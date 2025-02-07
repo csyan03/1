@@ -152,6 +152,9 @@
             <div class="thumbnail" data-folder="3">
                 <img src="241215-0.webp" class="thumb" alt="缩略图">
             </div>
+            <div class="thumbnail" data-folder="4">
+                <img src="241128-0.webp" class="thumb" alt="缩略图">
+            </div>
         </div>
     </div>
 
@@ -181,6 +184,10 @@ const foldersData = {
         bgm: "241215.mp3",
         media: ["241215-1.mp4", "241215-2.mp4", "241215-3.mp4", "241215-4.webp"]
     }
+    4: {
+    bgm: "241128.mp3",
+    media: ["241128-1.png"]
+    },
 };
 
 let currentFolder = null;
@@ -335,7 +342,7 @@ function closeFolder() {
 
 function getThumbnail(file) {
     if(file.endsWith('.mp4')) {
-        return file.replace('.mp4', '-thumb.jpg');
+        return file.replace('.mp4', '-0.webp');
     }
     return file;
 }
