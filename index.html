@@ -174,8 +174,6 @@ document.querySelectorAll('.thumbnail').forEach(thumb => {
     });
 });
 
-// ... 之前的代码保持不变 ...
-
 function openFolder(folderId) {
     const data = foldersData[folderId];
     const template = document.getElementById('folderTemplate');
@@ -199,23 +197,12 @@ function openFolder(folderId) {
         if(file.endsWith('.mp4')) {
             const video = document.createElement('video');
             video.loop = true;
-            // 确保不添加controls属性
-            video.controls = false; // 明确禁用控件
             video.innerHTML = `<source src="${file}" type="video/mp4">`;
             video.addEventListener('loadeddata', () => {
                 video.volume = 1;
                 if(currentIndex === 0) video.play();
             });
             item.appendChild(video);
-
-            // 添加点击事件到整个media-item
-            item.addEventListener('click', () => {
-                if (video.paused) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
-            });
         } else {
             const img = document.createElement('img');
             img.src = file;
@@ -229,12 +216,6 @@ function openFolder(folderId) {
     container.style.display = 'block';
     currentFolder = container;
     bgm.play();
-
-    // 初始化滑动事件
-    initSwipe(container);
-}
-
-// ... 之后的代码保持不变 ..
 
     // 初始化滑动事件
     initSwipe(container);
