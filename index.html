@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小明同学</title>
     <style>
-        * {
+         {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             touch-action: none;
         }
-
         body {
             overflow: hidden;
             font-family: Arial, sans-serif;
             background: #FFFFFF;
         }
 
-        /* 主页样式 */
+        / 主页样式 /
         .profile {
             position: relative;
             color: black;
@@ -37,13 +36,6 @@
             margin: 10px 0;
         }
 
-        .follow-btn {
-            width: 120px; /* 适当缩小 */
-            height: auto;
-            cursor: pointer;
-            margin-top: 10px;
-            display: block;
-}
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -56,7 +48,7 @@
             position: relative;
         }
 
-        /* 文件夹样式 */
+        / 文件夹样式 /
         .folder-container {
             position: fixed;
             top: 0;
@@ -106,6 +98,13 @@
             color: cyan;
             font-size: 24px;
         }
+
+        / 新增样式 /
+        .toggle-image {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -117,9 +116,9 @@
             <span>752获赞</span>
             <span>58关注</span>
             <span>88粉丝</span>
-            <img id="followBtn" src="gz.png" alt="关注" class="follow-btn">
-<audio id="bgmAudio" src="xht.mp3"></audio>
         </div>
+        <!-- 新增的图片元素 -->
+        <img id="toggleImage" src="gz.png" class="toggle-image" alt="切换图片">
         <div class="grid">
             <div class="thumbnail" data-folder="1">
                 <img src="250115-0.webp" class="thumb" alt="缩略图">
@@ -145,164 +144,163 @@
         </div>
     </template>
 
-<script>
-const foldersData = {
-    1: {
-        bgm: "250115.mp3",
-        media: ["250115-1.mp4", "250115-2.mp4"]
-    },
-    2: {
-        bgm: "250101.mp3",
-        media: ["250101-1.mp4", "250101-2.mp4", "250101-3.mp4", "250101-4.mp4"]
-    },
-    3: {
-        bgm: "241215.mp3",
-        media: ["241215-1.mp4", "241215-2.mp4", "241215-3.mp4", "241215-4.webp"]
-    }
-};
+    <script>
+        const foldersData = {
+            1: {
+                bgm: "250115.mp3",
+                media: ["250115-1.mp4", "250115-2.mp4"]
+            },
+            2: {
+                bgm: "250101.mp3",
+                media: ["250101-1.mp4", "250101-2.mp4", "250101-3.mp4", "250101-4.mp4"]
+            },
+            3: {
+                bgm: "241215.mp3",
+                media: ["241215-1.mp4", "241215-2.mp4", "241215-3.mp4", "241215-4.webp"]
+            }
+        };
 
-let currentFolder = null;
-let startX, startY;
-let currentIndex = 0;
+        let currentFolder = null;
+        let startX, startY;
+        let currentIndex = 0;
 
-// 初始化缩略图
-document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
-    const folderData = foldersData[index+1];
-    if(folderData) {
-        const firstMedia = folderData.media[0];
-        thumb.style.backgroundImage = `url('${getThumbnail(firstMedia)}')`;
-        thumb.style.backgroundSize = 'cover';
-    }
-});
+        // 初始化缩略图
+        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+            const folderData = foldersData[index+1];
+            if(folderData) {
+                const firstMedia = folderData.media[0];
+                thumb.style.backgroundImage = `url('${getThumbnail(firstMedia)}')`;
+                thumb.style.backgroundSize = 'cover';
+            }
+        });
 
-// 点击缩略图打开文件夹
-document.querySelectorAll('.thumbnail').forEach(thumb => {
-    thumb.addEventListener('click', () => {
-        const folderId = thumb.dataset.folder;
-        openFolder(folderId);
-    });
-});
-
-function openFolder(folderId) {
-    const data = foldersData[folderId];
-    const template = document.getElementById('folderTemplate');
-    const clone = template.content.cloneNode(true);
-    const container = clone.querySelector('.folder-container');
-    
-    
-    const followBtn = document.getElementById('followBtn');
-const bgmAudio = document.getElementById('bgmAudio');
-
-followBtn.addEventListener('click', () => {
-    if (followBtn.src.includes('gz.png')) {
-        followBtn.src = 'ygz.png';
-        bgmAudio.play();
-    } else {
-        followBtn.src = 'gz.png';
-        bgmAudio.pause();
-        bgmAudio.currentTime = 0;
-    }
-});
-
-    // 设置背景音乐
-    const bgm = container.querySelector('.bgm');
-    bgm.src = data.bgm;
-    bgm.loop = true;
-
-    // 设置日期
-    const dateStr = data.bgm.replace(/(\d{4})(\d{2})(\d{2}).*/, '$1年$2月$3日');
-    container.querySelector('.date').textContent = dateStr;
-
-    // 添加媒体内容
-    const carousel = container.querySelector('.carousel');
-    data.media.forEach(file => {
-        const item = document.createElement('div');
-        item.className = 'media-item';
-        if(file.endsWith('.mp4')) {
-            const video = document.createElement('video');
-            video.loop = true;
-            video.innerHTML = `<source src="${file}" type="video/mp4">`;
-            video.addEventListener('loadeddata', () => {
-                video.volume = 1;
-                if(currentIndex === 0) video.play();
+        // 点击缩略图打开文件夹
+        document.querySelectorAll('.thumbnail').forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                const folderId = thumb.dataset.folder;
+                openFolder(folderId);
             });
-            item.appendChild(video);
-        } else {
-            const img = document.createElement('img');
-            img.src = file;
-            item.appendChild(img);
+        });
+
+        function openFolder(folderId) {
+            const data = foldersData[folderId];
+            const template = document.getElementById('folderTemplate');
+            const clone = template.content.cloneNode(true);
+            const container = clone.querySelector('.folder-container');
+            
+            // 设置背景音乐
+            const bgm = container.querySelector('.bgm');
+            bgm.src = data.bgm;
+            bgm.loop = true;
+
+            // 设置日期
+            const dateStr = data.bgm.replace(/(\d{4})(\d{2})(\d{2})./, '$1年$2月$3日');
+            container.querySelector('.date').textContent = dateStr;
+
+            // 添加媒体内容
+            const carousel = container.querySelector('.carousel');
+            data.media.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'media-item';
+                if(file.endsWith('.mp4')) {
+                    const video = document.createElement('video');
+                    video.loop = true;
+                    video.innerHTML = `<source src="${file}" type="video/mp4">`;
+                    video.addEventListener('loadeddata', () => {
+                        video.volume = 1;
+                        if(currentIndex === 0) video.play();
+                    });
+                    item.appendChild(video);
+                } else {
+                    const img = document.createElement('img');
+                    img.src = file;
+                    item.appendChild(img);
+                }
+                carousel.appendChild(item);
+            });
+
+            // 添加到页面并显示
+            document.body.appendChild(clone);
+            container.style.display = 'block';
+            currentFolder = container;
+            bgm.play();
+
+            // 初始化滑动事件
+            initSwipe(container);
         }
-        carousel.appendChild(item);
-    });
 
-    // 添加到页面并显示
-    document.body.appendChild(clone);
-    container.style.display = 'block';
-    currentFolder = container;
-    bgm.play();
+        function initSwipe(container) {
+            let startX = 0;
+            let isSwiping = false;
 
-    // 初始化滑动事件
-    initSwipe(container);
-}
+            container.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+            });
 
-function initSwipe(container) {
-    let startX = 0;
-    let isSwiping = false;
+            container.addEventListener('touchmove', e => {
+                if(!isSwiping) return;
+                const deltaX = e.touches[0].clientX - startX;
+                container.querySelector('.carousel').style.transform = `translateX(${-currentIndex  100 + deltaX/window.innerWidth100}%)`;
+            });
 
-    container.addEventListener('touchstart', e => {
-        startX = e.touches[0].clientX;
-        isSwiping = true;
-    });
+            container.addEventListener('touchend', e => {
+                if(!isSwiping) return;
+                isSwiping = false;
+                
+                const deltaX = e.changedTouches[0].clientX - startX;
+                if(Math.abs(deltaX) > 50) {
+                    if(deltaX > 0 && currentIndex > 0) {
+                        currentIndex--;
+                    } else if(deltaX < 0 && currentIndex < container.querySelectorAll('.media-item').length - 1) {
+                        currentIndex++;
+                    }
+                }
+                container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100}%)`;
+                playCurrentMedia();
+            });
 
-    container.addEventListener('touchmove', e => {
-        if(!isSwiping) return;
-        const deltaX = e.touches[0].clientX - startX;
-        container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100 + deltaX/window.innerWidth*100}%)`;
-    });
+            // 关闭按钮
+            container.querySelector('.close-btn').addEventListener('click', () => {
+                closeFolder();
+            });
+        }
 
-    container.addEventListener('touchend', e => {
-        if(!isSwiping) return;
-        isSwiping = false;
-        
-        const deltaX = e.changedTouches[0].clientX - startX;
-        if(Math.abs(deltaX) > 50) {
-            if(deltaX > 0 && currentIndex > 0) {
-                currentIndex--;
-            } else if(deltaX < 0 && currentIndex < container.querySelectorAll('.media-item').length - 1) {
-                currentIndex++;
+        function playCurrentMedia() {
+            const currentItem = currentFolder.querySelectorAll('.media-item')[currentIndex];
+            const video = currentItem.querySelector('video');
+            if(video) {
+                video.currentTime = 0;
+                video.play();
             }
         }
-        container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100}%)`;
-        playCurrentMedia();
-    });
 
-    // 关闭按钮
-    container.querySelector('.close-btn').addEventListener('click', () => {
-        closeFolder();
-    });
-}
+        function closeFolder() {
+            currentFolder.remove();
+            currentFolder = null;
+            currentIndex = 0;
+        }
 
-function playCurrentMedia() {
-    const currentItem = currentFolder.querySelectorAll('.media-item')[currentIndex];
-    const video = currentItem.querySelector('video');
-    if(video) {
-        video.currentTime = 0;
-        video.play();
-    }
-}
+        function getThumbnail(file) {
+            if(file.endsWith('.mp4')) {
+                return file.replace('.mp4', '-thumb.jpg');
+            }
+            return file;
+        }
 
-function closeFolder() {
-    currentFolder.remove();
-    currentFolder = null;
-    currentIndex = 0;
-}
+        // 新增的JavaScript代码
+        const toggleImage = document.getElementById('toggleImage');
+        const audio = new Audio('xht.mp3');
 
-function getThumbnail(file) {
-    if(file.endsWith('.mp4')) {
-        return file.replace('.mp4', '-thumb.jpg');
-    }
-    return file;
-}
-</script>
+        toggleImage.addEventListener('click', () => {
+            if (toggleImage.src.endsWith('gz.png')) {
+                toggleImage.src = 'ygz.png';
+                audio.play();
+            } else {
+                toggleImage.src = 'gz.png';
+                audio.pause();
+            }
+        });
+    </script>
 </body>
 </html>
