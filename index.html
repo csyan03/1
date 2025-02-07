@@ -36,6 +36,24 @@
             font-size: 14px;
             margin: 10px 0;
         }
+        
+        .music-control {
+        background: none;
+        border: none;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        display: inline-block;
+        transition: transform 0.3s;
+    }
+
+    .music-control:hover {
+        transform: scale(1.1);
+    }
+
+    .stats {
+        position: relative; /* 确保音乐按钮能放在该位置 */
+    }
 
         .grid {
             display: grid;
@@ -99,31 +117,6 @@
             color: cyan;
             font-size: 24px;
         }
-        
-           /* 新增音乐控制按钮样式 */
-        .music-control {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #FFD700;
-            color: #1a1a1a;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s, background 0.3s;
-        }
-
-        .music-control:hover {
-            transform: scale(1.1);
-            background: #ffcc00;
-        }
     </style>
 </head>
 <body>
@@ -134,16 +127,16 @@
         <div class="stats">
             <span>752获赞</span>
             <span>58关注</span>
-            <span>88粉丝</span>
+            <span>88粉丝</span><br>
+            <button class="music-control" id="musicBtn">
+            <img src="gz.png" alt="Play Music" id="playIcon" width="50" height="50">
+        </button>
         </div>
-        <!-- 新增音乐控制按钮 -->
-    <button class="music-control" id="musicBtn">🎵</button>
-
-    <!-- 新增音频标签 -->
-    <audio id="bgMusic" loop>
-        <source src="xht.mp3" type="audio/mpeg">
+        <audio id="bgMusic" loop>
+        <source src="background-music.mp3" type="audio/mpeg">
         您的浏览器不支持音频播放。
     </audio>
+       
         <div class="grid">
             <div class="thumbnail" data-folder="1">
                 <img src="250115-0.webp" class="thumb" alt="缩略图">
@@ -199,9 +192,18 @@ document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
     }
 });
 
-// 新增背景音乐控制逻辑
+// 点击缩略图打开文件夹
+document.querySelectorAll('.thumbnail').forEach(thumb => {
+    thumb.addEventListener('click', () => {
+        const folderId = thumb.dataset.folder;
+        openFolder(folderId);
+    });
+});
+
+     // 新增背景音乐控制逻辑
         const musicBtn = document.getElementById('musicBtn');
         const bgMusic = document.getElementById('bgMusic');
+        const playIcon = document.getElementById('playIcon');
 
         // 初始化音乐状态
         let isMusicPlaying = false;
@@ -210,10 +212,10 @@ document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
         musicBtn.addEventListener('click', () => {
             if (isMusicPlaying) {
                 bgMusic.pause();
-                musicBtn.textContent = '🎵';
+                playIcon.src = 'gz.png';  // 切换为播放图标
             } else {
                 bgMusic.play();
-                musicBtn.textContent = '⏸';
+                playIcon.src = 'ygz.png';  // 切换为暂停图标
             }
             isMusicPlaying = !isMusicPlaying;
         });
@@ -222,18 +224,10 @@ document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
         document.addEventListener('click', () => {
             if (!isMusicPlaying) {
                 bgMusic.play();
-                musicBtn.textContent = '⏸';
+                playIcon.src = 'ygz.png';  // 切换为暂停图标
                 isMusicPlaying = true;
             }
         }, { once: true }); // 只执行一次
-        
-// 点击缩略图打开文件夹
-document.querySelectorAll('.thumbnail').forEach(thumb => {
-    thumb.addEventListener('click', () => {
-        const folderId = thumb.dataset.folder;
-        openFolder(folderId);
-    });
-});
 
 function openFolder(folderId) {
     const data = foldersData[folderId];
