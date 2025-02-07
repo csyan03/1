@@ -377,6 +377,207 @@ function initSwipe(container) {
     });
 
     // 关闭按钮
+<script>
+const foldersData = {
+    1: {
+        bgm: "250115.mp3",
+        media: ["250115-1.mp4", "250115-2.mp4"]
+    },
+    2: {
+        bgm: "250101.mp3",
+        media: ["250101-1.mp4", "250101-2.mp4", "250101-3.mp4", "250101-4.mp4"]
+    },
+    3: {
+        bgm: "241215.mp3",
+        media: ["241215-1.mp4", "241215-2.mp4", "241215-3.mp4", "241215-4.webp"]
+    },
+    4: {
+        bgm: "241128.mp3",
+        media: ["241128-1.png"]
+    },
+    5: {
+        bgm: "241123.mp3",
+        media: ["241123-1.mp4", "241123-2.mp4", "241123-3.png"]
+    },
+    6: {
+        bgm: "241116.mp3",
+        media: ["241116-1.mp4"]
+    },
+    7: {
+        bgm: "241102.mp3",
+        media: ["241102-1.jpeg", "241102-2.jpeg", "241102-3.jpeg"]
+    }
+};
+
+let currentFolder = null;
+let currentIndex = 0;
+
+// 初始化缩略图
+document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+    const folderData = foldersData[index+1];
+    if(folderData) {
+        const firstMedia = folderData.media[0];
+        thumb.style.backgroundImage = `url('${getThumbnail(firstMedia)}')`;
+        thumb.style.backgroundSize = 'cover';
+    }
+});
+
+// 点击缩略图打开文件夹
+document.querySelectorAll('.thumbnail').forEach(thumb => {
+    thumb.addEventListener('click', () => {
+        const folderId = thumb.dataset.folder;
+        openFolder(folderId);
+    });
+});
+
+// 音乐控制逻辑
+const musicBtn = document.getElementById('musicBtn');
+const bgMusic = document.getElementById('bgMusic');
+const playIcon = document.getElementById('playIcon');
+let isMusicPlaying = false;
+
+musicBtn.addEventListener('click', () => {
+    if (isMusicPlaying) {
+        bgMusic.pause();
+        playIcon.src = 'gz.png';
+    } else {
+        bgMusic.play();
+        playIcon.src = 'ygz.png';
+    }
+    isMusicPlaying = !isMusicPlaying;
+});
+
+document.addEventListener('click', () => {
+    if (!isMusicPlaying) {
+        bgMusic.play();
+        playIcon.src = 'ygz.png';
+        isMusicPlaying = true;
+    }
+}, { once: true });
+
+function openFolder(folderId) {
+    const data = foldersData[folderId];
+    if (!data) return;
+
+    const template = document.getElementById('folderTemplate');
+    const clone = template.content.cloneNode(true);
+    const container = clone.querySelector('.folder-container');
+    container.dataset.folderId = folderId;
+
+    // 设置背景音乐
+    const bgm = container.querySelector('.bgm');
+    bgm.src = data.bgm;
+    bgm.loop = true;
+
+    // 设置日期
+    const dateStr = data.bgm.replace(/(\d{4})(\d{2})(\d{2}).*/, '$1年$2月$3日');
+    container.querySelector('.date').textContent = dateStr;
+
+    // 添加媒体内容
+    const carousel = container.querySelector('.carousel');
+    data.media.forEach(file => {
+        const item = document.createElement('div');
+        item.className = 'media-item';
+        if(file.endsWith('.mp4')) {
+            const video = document.createElement('video');
+            video.loop = true;
+            video.innerHTML = `<source src="${file}" type="video/mp4">`;
+            video.addEventListener('loadeddata', () => {
+                video.volume = 1;
+                if(currentIndex === 0) video.play();
+            });
+            item.appendChild(video);
+        } else {
+            const img = document.createElement('img');
+            img.src = file;
+            item.appendChild(img);
+        }
+        carousel.appendChild(item);
+    });
+
+    document.body.appendChild(clone);
+    container.style.display = 'block';
+    currentFolder = container;
+    bgm.play();
+    currentIndex = 0;
+
+    initSwipe(container);
+}
+
+function initSwipe(container) {
+    let startX = 0, startY = 0;
+    let isSwiping = false;
+
+    container.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isSwiping = true;
+    });
+
+    container.addEventListener('touchmove', e => {
+        if (!isSwiping) return;
+        
+        const deltaX = e.touches[0].clientX - startX;
+        const deltaY = e.touches[0].clientY - startY;
+        
+        // 优先处理垂直滑动
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+            container.style.backgroundColor = `rgba(0, 0, 0, ${1 - Math.abs(deltaY)/300})`;
+            container.querySelector('.carousel').style.transform = `translateY(${deltaY}px)`;
+        } else {
+            container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100 + deltaX/window.innerWidth*100}%)`;
+        }
+    });
+
+    container.addEventListener('touchend', e => {
+        if (!isSwiping) return;
+        isSwiping = false;
+
+        const deltaX = e.changedTouches[0].clientX - startX;
+        const deltaY = e.changedTouches[0].clientY - startY;
+        const absDeltaY = Math.abs(deltaY);
+        const absDeltaX = Math.abs(deltaX);
+
+        // 垂直滑动处理（切换文件夹）
+        if (absDeltaY > absDeltaX && absDeltaY > 20) {
+            const folderId = parseInt(container.dataset.folderId);
+            let targetFolderId = folderId;
+
+            if (deltaY > 0) { // 下滑
+                do {
+                    targetFolderId++;
+                } while(targetFolderId <= 18 && !foldersData[targetFolderId]);
+            } else { // 上滑
+                do {
+                    targetFolderId--;
+                } while(targetFolderId >= 1 && !foldersData[targetFolderId]);
+            }
+
+            if (foldersData[targetFolderId]) {
+                closeFolder();
+                openFolder(targetFolderId.toString());
+            } else {
+                // 复位动画
+                container.querySelector('.carousel').style.transform = `translateY(0)`;
+                container.style.backgroundColor = '#000';
+            }
+        } 
+        // 水平滑动处理（切换媒体）
+        else if (absDeltaX > 50) {
+            const totalItems = container.querySelectorAll('.media-item').length;
+            if (deltaX > 0 && currentIndex > 0) {
+                currentIndex--;
+            } else if (deltaX < 0 && currentIndex < totalItems - 1) {
+                currentIndex++;
+            }
+            container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100}%)`;
+            playCurrentMedia();
+        } else {
+            container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100}%)`;
+        }
+    });
+
+    // 关闭按钮
     container.querySelector('.close-btn').addEventListener('click', () => {
         closeFolder();
     });
@@ -392,6 +593,7 @@ function playCurrentMedia() {
 }
 
 function closeFolder() {
+    currentFolder.querySelector('.bgm').pause();
     currentFolder.remove();
     currentFolder = null;
     currentIndex = 0;
