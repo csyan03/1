@@ -388,11 +388,11 @@ function initSwipe(container) {
             if (deltaY > 0) { // 下滑
                 do {
                     targetFolderId++;
-                } while(targetFolderId <= 18 && !foldersData[targetFolderId]);
+                } while(targetFolderId >= 1  && !foldersData[targetFolderId]);
             } else { // 上滑
                 do {
                     targetFolderId--;
-                } while(targetFolderId >= 1 && !foldersData[targetFolderId]);
+                } while(targetFolderId <= 18 && !foldersData[targetFolderId]);
             }
 
             if (foldersData[targetFolderId]) {
