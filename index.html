@@ -194,8 +194,9 @@ const toggleImage = document.getElementById('toggleImage');
 const audio = new Audio('xht.mp3');
 
 toggleImage.addEventListener('click', () => {
-    if (toggleImage.src.endsWith('gz.png')) {
+    if (toggleImage.src.includes('gz.png')) {
         toggleImage.src = 'ygz.png';
+        audio.currentTime = 0; // 让音频从头播放
         audio.play();
     } else {
         toggleImage.src = 'gz.png';
