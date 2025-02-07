@@ -9,13 +9,14 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            touch-action: none;
+            
         }
 
         body {
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background: #FFFFFF;
+        overflow-y: auto; /* 允许垂直滚动 */
+        font-family: Arial, sans-serif;
+        background: #FFFFFF;
+        min-height: 100vh; /* 确保内容不足时也能撑满屏幕 */
         }
 
         /* 主页样式 */
@@ -23,6 +24,7 @@
             position: relative;
             color: black;
             padding: 15px;
+            touch-action: pan-y; /* 允许垂直滑动 */
         }
 
         .avatar {
