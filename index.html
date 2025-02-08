@@ -272,7 +272,7 @@ const foldersData = {
     },
     10: {
         bgm: "241001.mp3",
-        media: ["241001-1.webp", "241001-2.webp", "241001-3.webp", "241001-4.webp", "241001-5.webp"]
+        media: ["241001-1.webp","241001-2.webp","241001-3.webp","241001-4.webp","241001-5.webp"]
     },
     11: {
         bgm: "240930.mp3",
@@ -306,6 +306,7 @@ const foldersData = {
         bgm: "240529.mp3",
         media: ["240529-1.mp4"]
     }
+    
 };
 
 let currentFolder = null;
@@ -330,28 +331,28 @@ document.querySelectorAll('.thumbnail').forEach(thumb => {
     });
 });
 
-// 新增背景音乐控制逻辑
-const musicBtn = document.getElementById('musicBtn');
-const bgMusic = document.getElementById('bgMusic');
-const playIcon = document.getElementById('playIcon');
+     // 新增背景音乐控制逻辑
+        const musicBtn = document.getElementById('musicBtn');
+        const bgMusic = document.getElementById('bgMusic');
+        const playIcon = document.getElementById('playIcon');
 
-// 初始化音乐状态
-let isMusicPlaying = false;
+        // 初始化音乐状态
+        let isMusicPlaying = false;
 
-// 点击按钮控制音乐播放/暂停
-musicBtn.addEventListener('click', () => {
-    if (isMusicPlaying) {
-        bgMusic.pause();
-        playIcon.src = 'gz.png';  // 切换为播放图标
-    } else {
-        bgMusic.play();
-        playIcon.src = 'ygz.png';  // 切换为暂停图标
-    }
-    isMusicPlaying = !isMusicPlaying;
-});
+        // 点击按钮控制音乐播放/暂停
+        musicBtn.addEventListener('click', () => {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                playIcon.src = 'gz.png';  // 切换为播放图标
+            } else {
+                bgMusic.play();
+                playIcon.src = 'ygz.png';  // 切换为暂停图标
+            }
+            isMusicPlaying = !isMusicPlaying;
+        });
 
-// 自动播放音乐（需用户交互后触发）
-document.addEventListener('pointerdown', () => {
+        // 自动播放音乐（需用户交互后触发）
+        document.addEventListener('pointerdown', () => {
     if (!isMusicPlaying) {
         bgMusic.play().then(() => {
             playIcon.src = 'ygz.png';
@@ -368,25 +369,17 @@ function openFolder(folderId) {
     const clone = template.content.cloneNode(true);
     const container = clone.querySelector('.folder-container');
     
-    // 先停止并重置背景音乐
+    // 设置背景音乐
     const bgm = container.querySelector('.bgm');
-    if (bgm) {
-        bgm.pause();
-        bgm.currentTime = 0;
-        bgm.src = data.bgm;
-        bgm.loop = true;
-        bgm.play();
-    }
+    bgm.src = data.bgm;
+    bgm.loop = true;
 
     // 设置日期
     const dateStr = data.bgm.replace(/(\d{4})(\d{2})(\d{2}).*/, '$1年$2月$3日');
     container.querySelector('.date').textContent = dateStr;
 
-    // 清空原有的媒体项目
+    // 添加媒体内容
     const carousel = container.querySelector('.carousel');
-    carousel.innerHTML = ''; // 清空已有的媒体项
-    
-    // 添加新的媒体内容
     data.media.forEach(file => {
         const item = document.createElement('div');
         item.className = 'media-item';
@@ -411,7 +404,7 @@ function openFolder(folderId) {
     document.body.appendChild(clone);
     container.style.display = 'block';
     currentFolder = container;
-    currentIndex = 0; // 重置当前索引
+    bgm.play();
 
     // 初始化滑动事件
     initSwipe(container);
@@ -420,46 +413,38 @@ function openFolder(folderId) {
 function initSwipe(container) {
     let startX = 0;
     let isSwiping = false;
-    let minSwipeDistance = 50; // 避免误触，滑动 50px 以上才切换
 
-    function startSwipe(e) {
-        if (e.touches && e.touches.length > 1) return; // 只处理单指滑动
-        startX = e.touches ? e.touches[0].clientX : e.clientX;
+    container.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
         isSwiping = true;
-    }
+    });
 
-    function moveSwipe(e) {
-        if (!isSwiping) return;
-        const moveX = e.touches ? e.touches[0].clientX : e.clientX;
-        const deltaX = moveX - startX;
-        container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100 + (deltaX / window.innerWidth) * 100}%)`;
-    }
+    container.addEventListener('touchmove', e => {
+        if(!isSwiping) return;
+        const deltaX = e.touches[0].clientX - startX;
+        container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100 + deltaX/window.innerWidth*100}%)`;
+    });
 
-    function endSwipe(e) {
-        if (!isSwiping) return;
+    container.addEventListener('touchend', e => {
+        if(!isSwiping) return;
         isSwiping = false;
-        const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-        const deltaX = endX - startX;
-
-        if (Math.abs(deltaX) > minSwipeDistance) {
-            if (deltaX > 0 && currentIndex > 0) {
+        
+        const deltaX = e.changedTouches[0].clientX - startX;
+        if(Math.abs(deltaX) > 50) {
+            if(deltaX > 0 && currentIndex > 0) {
                 currentIndex--;
-            } else if (deltaX < 0 && currentIndex < container.querySelectorAll('.media-item').length - 1) {
+            } else if(deltaX < 0 && currentIndex < container.querySelectorAll('.media-item').length - 1) {
                 currentIndex++;
             }
         }
-
         container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100}%)`;
         playCurrentMedia();
-    }
+    });
 
-    // 监听触摸 & 鼠标事件
-    container.addEventListener('touchstart', startSwipe);
-    container.addEventListener('touchmove', moveSwipe);
-    container.addEventListener('touchend', endSwipe);
-    container.addEventListener('mousedown', startSwipe);
-    container.addEventListener('mousemove', moveSwipe);
-    container.addEventListener('mouseup', endSwipe);
+    // 关闭按钮
+    container.querySelector('.close-btn').addEventListener('click', () => {
+        closeFolder();
+    });
 }
 
 function playCurrentMedia() {
@@ -472,22 +457,17 @@ function playCurrentMedia() {
 }
 
 function closeFolder() {
-    if (currentFolder) {
-        currentFolder.remove();
-        currentFolder = null;
-        currentIndex = 0;
-    }
+    currentFolder.remove();
+    currentFolder = null;
+    currentIndex = 0;
 }
-
-// 监听点击背景区域关闭
-document.addEventListener('click', (e) => {
-    if (currentFolder && e.target.classList.contains('folder-container')) {
-        closeFolder();
-    }
-});
 
 function getThumbnail(file) {
     if(file.endsWith('.mp4')) {
+        return file.replace('.mp4', '-0.webp');
+    }
+    return file;
+}
 </script>
 </body>
 </html>
