@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<!DOCTYPE html><html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,77 +7,145 @@
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
+            box-sizing: border-box;}
 
-        body {
-            overflow-y: auto; /* 允许垂直滚动 */
-            font-family: Arial, sans-serif;
-            background: #FFFFFF;
-            min-height: 100vh; /* 确保内容不足时也能撑满屏幕 */
-        }
+    body {
+    overflow-y: auto; /* 允许垂直滚动 */
+    font-family: Arial, sans-serif;
+    background: #FFFFFF;
+    min-height: 100vh; /* 确保内容不足时也能撑满屏幕 */
+    }
 
-        .profile {
-            position: relative;
-            color: black;
-            padding: 15px;
-            touch-action: pan-y; /* 允许垂直滑动 */
-        }
+    /* 主页样式 */
+    .profile {
+        position: relative;
+        color: black;
+        padding: 15px;
+        touch-action: pan-y; /* 允许垂直滑动 */
+    }
 
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
+    .avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
 
-        .music-control {
-            background: none;
-            border: none;
-            width: 90vw;
-            height: 50px;
-            cursor: pointer;
-            display: block;
-            margin: 0 auto;
-        }
+    .stats {
+        font-size: 14px;
+        margin: 10px 0;
+    }
+    
+    .music-control {
+    background: none;
+    border: none;
+    width: 90vw;
+    height: 50px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto; /* 水平居中 */
+}
 
-        .music-control img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+.music-control:hover {
+    transform: scale(1);
+}
+.music-control img {
+    width: 100%;  /* 让图片宽度填充整个 .music-control */
+    height: auto; /* 保持图片比例 */
+    display: block; /* 避免默认的行内空隙 */
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
-        }
+.stats {
+    position: relative; /* 确保音乐按钮能放在该位置 */
+}
 
-        .grid img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+    }
+    .grid img {
+width: 100%;
+height: 100%;
+object-fit: cover; /* 裁剪填充，不变形 */
+  display: block;  /* 去掉默认的 img 间隙 */
 
-        .close-btn {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            width: 60px;  
-            height: 60px;
-            background-image: url('https://cdn.jsdelivr.net/gh/csyan03/1@main/241226-t.jpg'); 
-            background-size: cover;
-            background-repeat: no-repeat;
-            text-indent: -9999px; 
-            border: none;
-            cursor: pointer;
-            z-index: 1001;
-            border-radius: 50%;
-        }
-    </style>
+}
+
+.thumbnail {
+        aspect-ratio: 3/4;
+        background: #FFFFFF;
+        position: relative;
+    }
+
+    /* 文件夹样式 */
+    .folder-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: none;
+        background: #000; /* 新增黑色背景 */
+        z-index: 1000; /* 确保在最上层 */
+    }
+
+    .folder {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    .carousel {
+        display: flex;
+        transition: transform 0.3s;
+    }
+
+    .media-item {
+        flex: 0 0 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    video, img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .date {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        color: white;
+        font-size: 14px;
+        z-index: 1001;
+    }
+
+    .close-btn {
+position: absolute;
+top: 30px;
+right: 40px;
+width: 60px;  
+height: 60px;
+background-image: url('https://cdn.jsdelivr.net/gh/csyan03/1@main/241226-t.jpg'); 
+background-size: cover;
+background-repeat: no-repeat;
+text-indent: -9999px; 
+border: none;
+cursor: pointer;
+z-index: 1001;
+border-radius: 50%; /* 添加这一行，使按钮呈圆形 */
+
+}
+
+</style>
+
 </head>
 <body>
+    <!-- 主页内容 -->
     <div class="profile">
         <img src="https://cdn.jsdelivr.net/gh/csyan03/1@main/241226-t.jpg" class="avatar" alt="头像">
         <h1>小明同学</h1>
@@ -87,15 +154,13 @@
             <span>皇帝</span>
             <br>
             <button class="music-control" id="musicBtn">
-                <img src="https://cdn.jsdelivr.net/gh/csyan03/1@main/gz.png" alt="Play Music" id="playIcon">
-            </button>
+            <img src="https://cdn.jsdelivr.net/gh/csyan03/1@main/gz.png" alt="Play Music" id="playIcon" width="50" height="50">
+        </button>
         </div>
         <audio id="bgMusic" loop>
-            <source src="https://cdn.jsdelivr.net/gh/csyan03/1@main/xht.mp3" type="audio/mpeg">
-            您的浏览器不支持音频播放。
-        </audio>
-       
-        <div class="grid">
+        <source src="https://cdn.jsdelivr.net/gh/csyan03/1@main/xht.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio> <div class="grid">
             <!-- 缩略图 -->
             <div class="thumbnail" data-folder="1">
                 <img src="https://cdn.jsdelivr.net/gh/csyan03/1@main/250115-0.webp" class="thumb" alt="缩略图">
@@ -154,19 +219,21 @@
         </div>
     </div>
 
-    <!-- 文件夹模板 -->
-    <template id="folderTemplate">
-        <div class="folder-container">
-            <div class="folder">
-                <div class="carousel"></div>
-                <div class="date"></div>
-                <audio class="bgm"></audio>
-                <div class="close-btn">close</div>
-            </div>
+<!-- 文件夹模板 -->
+<template id="folderTemplate">
+    <div class="folder-container">
+        <div class="folder">
+            <div class="carousel"></div>
+            <div class="date"></div>
+            <audio class="bgm"></audio>
+            <div class="close-btn">close</div>
         </div>
-    </template>
+    </div>
+</template>
 
 <script>
+const basePath = "https://cdn.jsdelivr.net/gh/csyan03/1@main/";
+
 const foldersData = {
     1: {
         bgm: "250115.mp3",
@@ -265,6 +332,15 @@ document.querySelectorAll('.thumbnail').forEach(thumb => {
     });
 });
 
+// 给每个文件路径添加前缀
+Object.keys(foldersData).forEach(folderId => {
+    const folder = foldersData[folderId];
+    folder.bgm = basePath + folder.bgm;
+    folder.media = folder.media.map(file => basePath + file);
+});
+
+console.log(foldersData);
+
      // 新增背景音乐控制逻辑
         const musicBtn = document.getElementById('musicBtn');
         const bgMusic = document.getElementById('bgMusic');
@@ -289,11 +365,12 @@ document.querySelectorAll('.thumbnail').forEach(thumb => {
         document.addEventListener('pointerdown', () => {
     if (!isMusicPlaying) {
         bgMusic.play().then(() => {
-            playIcon.src = 'https://cdn.jsdelivr.net/gh/csyan03/1@main/ygz.png';
+            playIcon.src = 'ygz.png';
             isMusicPlaying = true;
         }).catch(err => {
             console.warn('音乐播放失败:', err);
         });
+        playIcon.src = 'https://cdn.jsdelivr.net/gh/csyan03/1@main/gz.png';
     }
 }, { once: true });
 
@@ -404,6 +481,5 @@ function getThumbnail(file) {
     }
     return file;
 }
-</script>
-</body>
+</script></body>
 </html>
