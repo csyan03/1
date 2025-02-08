@@ -317,13 +317,16 @@ document.querySelectorAll('.thumbnail').forEach(thumb => {
         });
 
         // 自动播放音乐（需用户交互后触发）
-        document.addEventListener('click', () => {
-            if (!isMusicPlaying) {
-                bgMusic.play();
-                playIcon.src = 'ygz.png';  // 切换为暂停图标
-                isMusicPlaying = true;
-            }
-        }, { once: true }); // 只执行一次
+        document.addEventListener('pointerdown', () => {
+    if (!isMusicPlaying) {
+        bgMusic.play().then(() => {
+            playIcon.src = 'ygz.png';
+            isMusicPlaying = true;
+        }).catch(err => {
+            console.warn('音乐播放失败:', err);
+        });
+    }
+}, { once: true });
 
 function openFolder(folderId) {
     const data = foldersData[folderId];
