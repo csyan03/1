@@ -150,9 +150,9 @@
         <img src="241226-t.jpg" class="avatar" alt="头像">
         <h1>小明同学</h1>
         <div class="stats">
-            <span>752获赞</span>
-            <span>58关注</span>
-            <span>88粉丝</span><br>
+            <span>出生</span>
+            <span>皇帝</span>
+            <br>
             <button class="music-control" id="musicBtn">
             <img src="gz.png" alt="Play Music" id="playIcon" width="50" height="50">
         </button>
@@ -413,33 +413,47 @@ function openFolder(folderId) {
 function initSwipe(container) {
     let startX = 0;
     let isSwiping = false;
+    let minSwipeDistance = 50; // 避免误触，滑动 50px 以上才切换
 
-    container.addEventListener('touchstart', e => {
-        startX = e.touches[0].clientX;
+    function startSwipe(e) {
+        if (e.touches && e.touches.length > 1) return; // 只处理单指滑动
+        startX = e.touches ? e.touches[0].clientX : e.clientX;
         isSwiping = true;
-    });
+    }
 
-    container.addEventListener('touchmove', e => {
-        if(!isSwiping) return;
-        const deltaX = e.touches[0].clientX - startX;
-        container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100 + deltaX/window.innerWidth*100}%)`;
-    });
+    function moveSwipe(e) {
+        if (!isSwiping) return;
+        const moveX = e.touches ? e.touches[0].clientX : e.clientX;
+        const deltaX = moveX - startX;
+        container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100 + (deltaX / window.innerWidth) * 100}%)`;
+    }
 
-    container.addEventListener('touchend', e => {
-        if(!isSwiping) return;
+    function endSwipe(e) {
+        if (!isSwiping) return;
         isSwiping = false;
-        
-        const deltaX = e.changedTouches[0].clientX - startX;
-        if(Math.abs(deltaX) > 50) {
-            if(deltaX > 0 && currentIndex > 0) {
+        const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+        const deltaX = endX - startX;
+
+        if (Math.abs(deltaX) > minSwipeDistance) {
+            if (deltaX > 0 && currentIndex > 0) {
                 currentIndex--;
-            } else if(deltaX < 0 && currentIndex < container.querySelectorAll('.media-item').length - 1) {
+            } else if (deltaX < 0 && currentIndex < container.querySelectorAll('.media-item').length - 1) {
                 currentIndex++;
             }
         }
+
         container.querySelector('.carousel').style.transform = `translateX(${-currentIndex * 100}%)`;
         playCurrentMedia();
-    });
+    }
+
+    // 监听触摸 & 鼠标事件
+    container.addEventListener('touchstart', startSwipe);
+    container.addEventListener('touchmove', moveSwipe);
+    container.addEventListener('touchend', endSwipe);
+    container.addEventListener('mousedown', startSwipe);
+    container.addEventListener('mousemove', moveSwipe);
+    container.addEventListener('mouseup', endSwipe);
+}
 
     // 关闭按钮
     container.querySelector('.close-btn').addEventListener('click', () => {
@@ -457,10 +471,19 @@ function playCurrentMedia() {
 }
 
 function closeFolder() {
-    currentFolder.remove();
-    currentFolder = null;
-    currentIndex = 0;
+    if (currentFolder) {
+        currentFolder.remove();
+        currentFolder = null;
+        currentIndex = 0;
+    }
 }
+
+// 监听点击背景区域关闭
+document.addEventListener('click', (e) => {
+    if (currentFolder && e.target.classList.contains('folder-container')) {
+        closeFolder();
+    }
+});
 
 function getThumbnail(file) {
     if(file.endsWith('.mp4')) {
