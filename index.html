@@ -230,10 +230,7 @@ border-radius: 50%; /* 添加这一行，使按钮呈圆形 */
         </div>
     </div>
 </template>
-
 <script>
-const basePath = "https://cdn.jsdelivr.net/gh/csyan03/1@main/";
-
 const foldersData = {
     1: {
         bgm: "250115.mp3",
@@ -332,15 +329,6 @@ document.querySelectorAll('.thumbnail').forEach(thumb => {
     });
 });
 
-// 给每个文件路径添加前缀
-Object.keys(foldersData).forEach(folderId => {
-    const folder = foldersData[folderId];
-    folder.bgm = basePath + folder.bgm;
-    folder.media = folder.media.map(file => basePath + file);
-});
-
-console.log(foldersData);
-
      // 新增背景音乐控制逻辑
         const musicBtn = document.getElementById('musicBtn');
         const bgMusic = document.getElementById('bgMusic');
@@ -370,7 +358,6 @@ console.log(foldersData);
         }).catch(err => {
             console.warn('音乐播放失败:', err);
         });
-        playIcon.src = 'https://cdn.jsdelivr.net/gh/csyan03/1@main/gz.png';
     }
 }, { once: true });
 
@@ -481,5 +468,5 @@ function getThumbnail(file) {
     }
     return file;
 }
-</script></body>
-</html>
+</script>
+
