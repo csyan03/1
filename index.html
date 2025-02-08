@@ -272,7 +272,7 @@ const foldersData = {
     },
     10: {
         bgm: "241001.mp3",
-        media: ["241001-1.webp","241001-2.webp","241001-3.webp","241001-4.webp","241001-5.webp"]
+        media: ["241001-1.webp", "241001-2.webp", "241001-3.webp", "241001-4.webp", "241001-5.webp"]
     },
     11: {
         bgm: "240930.mp3",
@@ -306,7 +306,6 @@ const foldersData = {
         bgm: "240529.mp3",
         media: ["240529-1.mp4"]
     }
-    
 };
 
 let currentFolder = null;
@@ -331,28 +330,28 @@ document.querySelectorAll('.thumbnail').forEach(thumb => {
     });
 });
 
-     // 新增背景音乐控制逻辑
-        const musicBtn = document.getElementById('musicBtn');
-        const bgMusic = document.getElementById('bgMusic');
-        const playIcon = document.getElementById('playIcon');
+// 新增背景音乐控制逻辑
+const musicBtn = document.getElementById('musicBtn');
+const bgMusic = document.getElementById('bgMusic');
+const playIcon = document.getElementById('playIcon');
 
-        // 初始化音乐状态
-        let isMusicPlaying = false;
+// 初始化音乐状态
+let isMusicPlaying = false;
 
-        // 点击按钮控制音乐播放/暂停
-        musicBtn.addEventListener('click', () => {
-            if (isMusicPlaying) {
-                bgMusic.pause();
-                playIcon.src = 'gz.png';  // 切换为播放图标
-            } else {
-                bgMusic.play();
-                playIcon.src = 'ygz.png';  // 切换为暂停图标
-            }
-            isMusicPlaying = !isMusicPlaying;
-        });
+// 点击按钮控制音乐播放/暂停
+musicBtn.addEventListener('click', () => {
+    if (isMusicPlaying) {
+        bgMusic.pause();
+        playIcon.src = 'gz.png';  // 切换为播放图标
+    } else {
+        bgMusic.play();
+        playIcon.src = 'ygz.png';  // 切换为暂停图标
+    }
+    isMusicPlaying = !isMusicPlaying;
+});
 
-        // 自动播放音乐（需用户交互后触发）
-        document.addEventListener('pointerdown', () => {
+// 自动播放音乐（需用户交互后触发）
+document.addEventListener('pointerdown', () => {
     if (!isMusicPlaying) {
         bgMusic.play().then(() => {
             playIcon.src = 'ygz.png';
@@ -369,17 +368,25 @@ function openFolder(folderId) {
     const clone = template.content.cloneNode(true);
     const container = clone.querySelector('.folder-container');
     
-    // 设置背景音乐
+    // 先停止并重置背景音乐
     const bgm = container.querySelector('.bgm');
-    bgm.src = data.bgm;
-    bgm.loop = true;
+    if (bgm) {
+        bgm.pause();
+        bgm.currentTime = 0;
+        bgm.src = data.bgm;
+        bgm.loop = true;
+        bgm.play();
+    }
 
     // 设置日期
     const dateStr = data.bgm.replace(/(\d{4})(\d{2})(\d{2}).*/, '$1年$2月$3日');
     container.querySelector('.date').textContent = dateStr;
 
-    // 添加媒体内容
+    // 清空原有的媒体项目
     const carousel = container.querySelector('.carousel');
+    carousel.innerHTML = ''; // 清空已有的媒体项
+    
+    // 添加新的媒体内容
     data.media.forEach(file => {
         const item = document.createElement('div');
         item.className = 'media-item';
@@ -404,7 +411,7 @@ function openFolder(folderId) {
     document.body.appendChild(clone);
     container.style.display = 'block';
     currentFolder = container;
-    bgm.play();
+    currentIndex = 0; // 重置当前索引
 
     // 初始化滑动事件
     initSwipe(container);
@@ -455,12 +462,6 @@ function initSwipe(container) {
     container.addEventListener('mouseup', endSwipe);
 }
 
-    // 关闭按钮
-    container.querySelector('.close-btn').addEventListener('click', () => {
-        closeFolder();
-    });
-}
-
 function playCurrentMedia() {
     const currentItem = currentFolder.querySelectorAll('.media-item')[currentIndex];
     const video = currentItem.querySelector('video');
@@ -487,10 +488,6 @@ document.addEventListener('click', (e) => {
 
 function getThumbnail(file) {
     if(file.endsWith('.mp4')) {
-        return file.replace('.mp4', '-0.webp');
-    }
-    return file;
-}
 </script>
 </body>
 </html>
